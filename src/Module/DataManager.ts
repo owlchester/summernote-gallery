@@ -139,4 +139,53 @@ export default class DataManager {
             this.fetchData();
         }
     }
+
+    fetchFolder(folder: any) {
+        var _this = this;
+
+        // Prevent simultaneous requests.
+        // Because we need to get the next page link from each request,
+        // they must be synchronous.
+        //if (this.is_fetching_locked) return;
+
+        //console.log('getting images from folder url', folder);
+        var current_link = folder;
+
+        this.event.trigger('beforeFetch');
+
+        this.lockFetching();
+
+        $.ajax({
+            url: current_link,
+            beforeSend:function(xhr: any){
+                // set the request link to get it afterwards in the response
+                xhr.request_link = current_link;
+            },
+        })
+            .always(function () {
+                // this is the first callback to be called when the request finishs
+                _this.unlockFetching();
+            })
+            .done(function(response: any, status_text: any, xhr: any){
+
+                var parsed_response = _this.parseResponse(response);
+                _this.current_page++;
+
+                //
+                _this.setNextFetch(parsed_response);
+
+                _this.event.trigger('fetch', [
+                    parsed_response.data,
+                    _this.current_page,
+                    xhr.request_link,
+                    parsed_response.next_link
+                ]);
+            })
+            .fail(function() {
+                _this.event.trigger('error', ["problem loading from " + current_link]);
+            })
+            .always(function () {
+                _this.event.trigger('afterFetch');
+            });
+    }
 }

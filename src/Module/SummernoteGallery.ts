@@ -100,6 +100,9 @@ export default class SummernoteGallery {
                 _this.data_manager.fetchNext();
             }
         });
+        this.modal.event.on('loadFolder', function (random: any, folder: any) {
+            _this.data_manager.fetchFolder(folder);
+        });
 
         this.modal.event.on('close', function (gallery_modal: any) {
             _this.data_manager.init();

@@ -78,6 +78,22 @@ export default class GalleryModal {
 
         for (var i = 0; i < data.length; i++) {
 
+            // If we're working with a folder, different stuff going on
+            if (data[i].folder) {
+                $image = $('<div class="col-md-12 thumbnail cursor text-center" title="' + data[i].title + '" data-url="' + data[i].url + '"/>');
+                $image.html('<span class="text"><i class="fa-solid fa-folder fa-2x"></i>' + data[i].title + '</span>');
+
+                $image.on('click', function (event) {
+                    _this.loadFolder($(this).data('url'));
+                });
+
+                $item = $('<div class="col-md-2 img-item">' + '<i class="fa-solid fa-check"></i>' + '</div>');
+                $item.prepend($image);
+                content.push($item);
+
+                continue;
+            }
+
             var $image = $('<img class="img-thumbnail sng-image" title="'+ data[i].title +'" data-page="' + page + '"/>');
 
             $image.get(0).onload = function() {
@@ -275,5 +291,15 @@ export default class GalleryModal {
                         +'}'
                     +'</style>');
         this.$css.appendTo('body');
+    }
+
+    loadFolder(folder: any) {
+        //console.log('loading folder', folder);
+        var _this = this;
+
+        this.clearContent();
+        this.showLoading();
+
+        _this.event.trigger('loadFolder', [_this, folder]);
     }
 }
