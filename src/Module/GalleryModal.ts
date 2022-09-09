@@ -80,7 +80,7 @@ export default class GalleryModal {
 
             // If we're working with a folder, different stuff going on
             if (data[i].folder) {
-                $image = $('<div class="col-md-12 thumbnail cursor text-center" title="' + data[i].title + '" data-url="' + data[i].url + '"/>');
+                $image = $('<div class="col-md-12 img-thumbnail cursor text-center" title="' + data[i].title + '" data-url="' + data[i].url + '"/>');
                 $image.html('<span class="text"><i class="fa-solid fa-folder fa-2x"></i>' + data[i].title + '</span>');
 
                 $image.on('click', function (event) {

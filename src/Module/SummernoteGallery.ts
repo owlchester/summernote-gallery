@@ -13,8 +13,8 @@ export default class SummernoteGallery {
     constructor(options: any) {
         this.options = $.extend({
             name: 'summernoteGallery',
-            buttonLabel: '<i class="fa fa-file-image-o"></i> SN Gallery',
-            tooltip: 'summernote gallery'
+            buttonLabel: '<i class="fa-solid fa-file-image"></i>',
+            tooltip: 'Campaign Gallery'
         }, options);
 
         this.plugin_default_options = {}
