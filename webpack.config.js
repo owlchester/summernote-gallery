@@ -38,7 +38,7 @@ const galleryBrickConfig = { ...config, ...{
     entry: "./src/index.ts",
     output: {
         path: path.resolve( __dirname, 'dist' ),
-        filename: 'snb-gallery-brick.min.js',
+        filename: 'summernote-gallery-kanka.min.js',
     },
 }};
 
