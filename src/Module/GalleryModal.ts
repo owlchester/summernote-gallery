@@ -87,7 +87,7 @@ export default class GalleryModal {
                     _this.loadFolder($(this).data('url'));
                 });
 
-                $item = $('<div class="col-md-2 img-item">' + '<i class="fa-solid fa-check"></i>' + '</div>');
+                $item = $('<div class="col-md-2 img-item">' + '<i class="fa-solid fa-check" aria-hidden="true"></i>' + '</div>');
                 $item.prepend($image);
                 content.push($item);
 
@@ -98,12 +98,13 @@ export default class GalleryModal {
 
             $image.get(0).onload = function() {
                 $(this).siblings('.loading').hide()
-                $(this).click(function(event) {
+                $(this).on('click',function(event) {
                     $(this).toggleClass(_this.select_class);
                 });
             }
 
             $image.attr('src', data[i].src);
+            $image.data('gallery-id', data[i].id);
 
             var $item = $('<div class="col-md-2 mb-4 img-item">'
                             +'<i class="fa fa-check"></i>'

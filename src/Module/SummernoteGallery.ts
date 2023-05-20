@@ -91,7 +91,7 @@ export default class SummernoteGallery {
             // add selected images to summernote editor
             _this.context.invoke(
                 'editor.pasteHTML',
-                '<img src="' + $image.attr('src') + '" alt="' + ($image.attr('alt') || "") + '" />'
+                '<img src="' + $image.attr('src') + '" alt="' + ($image.attr('alt') || "") + '" data-gallery-id="' + ($image.data('gallery-id') || "") + '" />'
             );
         });
 

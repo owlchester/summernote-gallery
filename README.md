@@ -104,9 +104,9 @@ To run the plugin on local, head to the project root folder and run:
 4. Edit plugin files in the `/src` folder 
 5. `npm run build` to generate the build in `/dist` folder
 
-If you found any bugs or have suggestions, dont hesitate to throw it in the issues sections.
+If you found any bugs or have suggestions, don't hesitate to throw it in the issues sections.
 
-For more undestanding of how this module works take a look on the [v1](https://github.com/eissasoubhi/summernote-gallery/tree/v1) branch or the summernote extension basic sample [hello](https://github.com/summernote/summernote/blob/v0.7.0/examples/plugin-hello.html) .
+For more understanding of how this module works take a look on the [v1](https://github.com/eissasoubhi/summernote-gallery/tree/v1) branch or the summernote extension basic sample [hello](https://github.com/summernote/summernote/blob/v0.7.0/examples/plugin-hello.html) .
 
 # License
 The contents of this repository is licensed under [The MIT License.](https://opensource.org/licenses/MIT)
