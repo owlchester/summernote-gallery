@@ -17,7 +17,7 @@ export default class GalleryModal {
             maxHeight: 500,
 
             // modal title
-            title: 'summernote image gallery',
+            title: 'Campaign gallery',
 
             // close button text
             close_text: 'Close',
@@ -80,21 +80,21 @@ export default class GalleryModal {
 
             // If we're working with a folder, different stuff going on
             if (data[i].folder) {
-                $image = $('<div class="col-md-12 img-thumbnail cursor text-center" title="' + data[i].title + '" data-url="' + data[i].url + '"/>');
-                $image.html('<span class="text"><i class="fa-solid fa-folder fa-2x"></i>' + data[i].title + '</span>');
+                $image = $('<div class="img-thumbnail grow flex flex-col justify-center items-center gap-2 cursor-pointer " title="' + data[i].title + '" data-url="' + data[i].url + '"/>');
+                $image.html('<i class="' + data[i].icon + ' fa-2x" aria-hidden="true"></i>' + data[i].title + '</span>');
 
                 $image.on('click', function (event) {
                     _this.loadFolder($(this).data('url'));
                 });
 
-                $item = $('<div class="col-md-2 img-item">' + '<i class="fa-solid fa-check" aria-hidden="true"></i>' + '</div>');
+                $item = $('<div class="w-32 h-32 rounded bg-base-200 img-item shadow-sm hover:shadow-xl flex flex-stretch">' + '</div>');
                 $item.prepend($image);
                 content.push($item);
 
                 continue;
             }
 
-            var $image = $('<img class="img-thumbnail sng-image" title="'+ data[i].title +'" data-page="' + page + '"/>');
+            var $image = $('<img class="img-thumbnail sng-image rounded " title="'+ data[i].title +'" data-page="' + page + '"/>');
 
             $image.get(0).onload = function() {
                 $(this).siblings('.loading').hide()
@@ -103,13 +103,14 @@ export default class GalleryModal {
                 });
             }
 
-            $image.attr('src', data[i].src);
+            $image.attr('src', data[i].thumb);
             $image.data('gallery-id', data[i].id);
+            $image.data('full', data[i].src);
 
-            var $item = $('<div class="col-md-2 mb-4 img-item">'
-                            +'<i class="fa fa-check"></i>'
+            var $item = $('<div class="rounded w-32 h-32 cursor-pointer img-item shadow-sm hover:shadow-md hover:bg-base-200 flex justify-center items-center relative">'
+                            +'<i class="fa-solid fa-check fa-check absolute bottom-4 right-4 text-xl drop-shadow" aria-hidden="true"></i>'
                             +'<span class="loading">'
-                                +'<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>'
+                                +'<i class="fa-solid fa-spinner fa-pulse fa-3x fa-fw"></i>'
                             +'</span>'
                         +'</div>');
 
@@ -221,12 +222,12 @@ export default class GalleryModal {
                             + (bootsrap_version == 3 ? header_content.join('') : header_content.reverse().join(''))
                         + '</div>'
                         + '<div class="modal-body">'
-                            + '<div class="row images-list">'
+                            + '<div class="flex flex-wrap gap-5 images-list">'
                             + '</div>'
                         + '</div>'
                         + '<div class="modal-footer">'
                             + '<span style="display: none;position: absolute;left: 10px;bottom: 10px;" class="loading" >'
-                                + '<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>'
+                                + '<i class="fa-solid fa-spinner fa-pulse fa-3x fa-fw"></i>'
                             + '</span >'
                             + '<span style="display: inline-block; margin-right: 50px;">'
                                 + '<button type="button" id="deselect-all" class="btn btn-default">[Deselect-all]</button>'
@@ -245,15 +246,8 @@ export default class GalleryModal {
 
     addStyleToDom() {
         this.$css = $('<style>'
-                        +'.img-item{'
-                            +'position : relative;'
-                        +'}'
                         +'.img-item .fa-check{'
-                            +'position : absolute;'
-                            +'top : -10px;'
-                            +'right : 5px;'
-                            +'font-size: 30px;'
-                            +'color: #337AB7;'
+                            +'color: hsl(var(--ac)/1);'
                         +'}'
                         +'.img-item .sng-image{'
                             /*+'min-height : 119.66px;'*/
@@ -288,7 +282,7 @@ export default class GalleryModal {
                             +'display : block;'
                         +'}'
                         +'.'+ this.select_class +'{'
-                            +'background-color: #5CB85C;'
+                            +'background-color: hsl(var(--a)/1);'
                         +'}'
                     +'</style>');
         this.$css.appendTo('body');

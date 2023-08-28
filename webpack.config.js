@@ -37,8 +37,8 @@ const galleryBrickConfig = { ...config, ...{
     name: "galleryBrick",
     entry: "./src/index.ts",
     output: {
-        path: path.resolve( __dirname, 'dist' ),
-        filename: 'summernote-gallery-kanka.min.js',
+        path: path.resolve( __dirname, '../kanka/public/vendor/summernote/plugin/kanka' ),
+        filename: 'summernote-gallery.min.js',
     },
 }};
 
@@ -46,8 +46,8 @@ const galleryModuleConfig = { ...config, ...{
     name: "galleryModule",
     entry: "./src/Module/index.ts",
     output: {
-        path: path.resolve( __dirname, 'dist' ),
-        filename: 'module/index.js',
+        path: path.resolve( __dirname, '../kanka/public/vendor/summernote/plugin/kanka' ),
+        filename: 'summernote-gallery.min.js',
     },
 }};
 
