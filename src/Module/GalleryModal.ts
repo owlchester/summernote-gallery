@@ -110,7 +110,7 @@ export default class GalleryModal {
             }
 
             // Create the title overlay
-            let $titleOverlay = $('<div class="title-overlay absolute inset-x-0 bottom-0 bg-base-100 bg-opacity-60 px-2 py-1 text-xs text-center truncate text-base-content rounded m-1">' + data[i].title + '</div>');
+            let $titleOverlay = $('<div class="title-overlay absolute inset-x-0 bottom-0 bg-base-100 bg-opacity-60 backdrop-blur px-2 py-1 text-xs text-center truncate text-base-content rounded m-1">' + data[i].title + '</div>');
 
             // Adding corresponding styles in addStyleToDom() { this.css =( ' ' + // Existing styles... '.image-title-overlay {' + ' position: absolute;' + ' bottom: 0;' + ' width: 100%;' + ' background: rgba(0, 0, 0, 0.5);' + ' color: white;' + ' text-align: center;' + ' padding: 5px;' + ' font-size: 0.9rem;' + ' overflow: hidden;' + ' text-overflow: ellipsis;' + ' white-space: nowrap;' + ' backdrop-filter: blur(5px); /* Blur effect applied */' + ' box-shadow: 0 -0.5px 10px rgba(0, 0, 0, 0.8);' + ' border-radius: 0 0 8px 8px;' + '}' + '.img-item {' + ' position: relative;' + ' overflow: `addStyleToDom`
 
