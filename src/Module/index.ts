@@ -18,6 +18,10 @@ export default class GalleryPlugin {
             let buttonLabel = sgOptions.buttonLabel || _this.summernote_gallery.options.buttonLabel
 
             _this.summernote_gallery.options.buttonLabel = buttonLabel
+            let tooltip = sgOptions.tooltip || _this.summernote_gallery.options.tooltip
+
+            _this.summernote_gallery.options.tooltip = tooltip
+
 
             // add gallery button
             context.memo('button.' + options.name, _this.createButton());

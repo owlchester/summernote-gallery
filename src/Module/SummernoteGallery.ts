@@ -14,7 +14,7 @@ export default class SummernoteGallery {
         this.options = $.extend({
             name: 'summernoteGallery',
             buttonLabel: '<i class="fa-solid fa-file-image"></i>',
-            tooltip: 'Campaign Gallery'
+            tooltip: 'summernoteGallery'
         }, options);
 
         this.plugin_default_options = {}
@@ -107,6 +107,10 @@ export default class SummernoteGallery {
         this.modal.event.on('close', function (gallery_modal: any) {
             _this.data_manager.init();
             _this.modal.clearContent();
+        });
+
+        this.modal.event.on('search', function (gallery_modal: any, query: string) {
+            _this.data_manager.search(query);
         });
     }
 

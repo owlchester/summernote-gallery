@@ -8,6 +8,7 @@ export default class DataManager {
     private is_fetching_locked: boolean;
     private event: EventManager;
     private fetch_url: string;
+    private filtering: boolean;
 
     constructor(options: DataManagerOptionsInterface) {
         this.options = {
@@ -23,6 +24,8 @@ export default class DataManager {
 
                 // the key name that holds the next page link
                 nextPageKey: 'links.next',
+
+                filtering: false,
             }, ...options
         }
 
@@ -77,6 +80,10 @@ export default class DataManager {
 
     fetchData() {
         const _this = this;
+
+        if (this.filtering) {
+            return;
+        }
 
         if (this.fetch_type == 'data') {
 
@@ -188,4 +195,57 @@ export default class DataManager {
                 _this.event.trigger('afterFetch');
             });
     }
+
+    search(query: any) {
+        var _this = this;
+
+        if (!query || query === "" ) {
+            this.filtering = false;
+            this.current_page = 0;
+            this.fetch_url = this.options.url;
+            this.fetchData();
+            return;
+        }
+        this.filtering = true;
+
+        this.event.trigger('beforeFetch');
+
+        const current_link = this.options.url + '?name=' + query;
+
+        this.lockFetching();
+
+        $.ajax({
+            url: current_link,
+            beforeSend:function(xhr: any){
+                // set the request link to get it afterwards in the response
+                xhr.request_link = current_link;
+            },
+        })
+            .always(function () {
+                // this is the first callback to be called when the request finishs
+                _this.unlockFetching();
+            })
+            .done(function(response: any, status_text: any, xhr: any){
+
+                var parsed_response = _this.parseResponse(response);
+                _this.current_page++;
+
+                //
+                _this.setNextFetch(parsed_response);
+
+                _this.event.trigger('fetch', [
+                    parsed_response.data,
+                    _this.current_page,
+                    xhr.request_link,
+                    parsed_response.next_link
+                ]);
+            })
+            .fail(function() {
+                _this.event.trigger('error', ["problem loading from " + current_link]);
+            })
+            .always(function () {
+                _this.event.trigger('afterFetch');
+            });
+    }
+
 }

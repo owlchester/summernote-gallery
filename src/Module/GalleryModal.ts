@@ -7,6 +7,7 @@ export default class GalleryModal {
     private template: string;
     private readonly $modal: any;
     private options: any;
+    private latestQuery: any;
 
     constructor(options: any) {
         this.options = $.extend({
@@ -17,7 +18,7 @@ export default class GalleryModal {
             maxHeight: 500,
 
             // modal title
-            title: 'Campaign gallery',
+            title: 'Campaign Gallery',
 
             // close button text
             close_text: 'Close',
@@ -80,41 +81,50 @@ export default class GalleryModal {
 
             // If we're working with a folder, different stuff going on
             if (data[i].folder) {
-                $image = $('<div class="img-thumbnail grow flex flex-col justify-center items-center gap-2 cursor-pointer " title="' + data[i].title + '" data-url="' + data[i].url + '"/>');
-                $image.html('<i class="' + data[i].icon + ' fa-2x" aria-hidden="true"></i>' + data[i].title + '</span>');
+                let $image = $('<div class="img-thumbnail grow flex flex-col justify-center items-center gap-2 p-2 cursor-pointer " title="' + data[i].title + '" data-url="' + data[i].url + '"/>');
+                $image.html('<i class="' + data[i].icon + ' fa-2x" aria-hidden="true"></i><span class="text-center">' + data[i].title + '</span>');
 
                 $image.on('click', function (event) {
                     _this.loadFolder($(this).data('url'));
                 });
 
-                $item = $('<div class="w-32 h-32 rounded bg-base-200 img-item shadow-sm hover:shadow-xl flex flex-stretch">' + '</div>');
+                $item = $('<div class="w-32 h-32 rounded bg-base-200 img-item relative overflow-hidden shadow-sm hover:shadow-xl flex flex-stretch">' + '</div>');
                 $item.prepend($image);
                 content.push($item);
 
                 continue;
             }
 
-            var $image = $('<img class="img-thumbnail sng-image rounded " title="'+ data[i].title +'" data-page="' + page + '"/>');
+
+            let $div = $('<div class="relative w-32 h-32 flex items-end overflow-hidden bg-base-200 rounded shadow"></div>');
+            let $image = $('<img class="img-thumbnail sng-image rounded object-cover w-full h-full block " title="'+ data[i].title +'" data-page="' + page + '"/>');
+            $image.attr('src', data[i].thumb);
+            $image.data('gallery-id', data[i].id);
+            $image.data('full', data[i].src);
 
             $image.get(0).onload = function() {
-                $(this).siblings('.loading').hide()
+                $(this).parent().siblings('.img-loading').hide()
                 $(this).on('click',function(event) {
                     $(this).toggleClass(_this.select_class);
                 });
             }
 
-            $image.attr('src', data[i].thumb);
-            $image.data('gallery-id', data[i].id);
-            $image.data('full', data[i].src);
+            // Create the title overlay
+            let $titleOverlay = $('<div class="title-overlay absolute inset-x-0 bottom-0 bg-base-100 bg-opacity-60 px-2 py-1 text-xs text-center truncate text-base-content rounded m-1">' + data[i].title + '</div>');
 
-            var $item = $('<div class="rounded w-32 h-32 cursor-pointer img-item shadow-sm hover:shadow-md hover:bg-base-200 flex justify-center items-center relative">'
-                            +'<i class="fa-solid fa-check fa-check absolute bottom-4 right-4 text-xl drop-shadow" aria-hidden="true"></i>'
-                            +'<span class="loading">'
+            // Adding corresponding styles in addStyleToDom() { this.css =( ' ' + // Existing styles... '.image-title-overlay {' + ' position: absolute;' + ' bottom: 0;' + ' width: 100%;' + ' background: rgba(0, 0, 0, 0.5);' + ' color: white;' + ' text-align: center;' + ' padding: 5px;' + ' font-size: 0.9rem;' + ' overflow: hidden;' + ' text-overflow: ellipsis;' + ' white-space: nowrap;' + ' backdrop-filter: blur(5px); /* Blur effect applied */' + ' box-shadow: 0 -0.5px 10px rgba(0, 0, 0, 0.8);' + ' border-radius: 0 0 8px 8px;' + '}' + '.img-item {' + ' position: relative;' + ' overflow: `addStyleToDom`
+
+            let $checked = $('<i class="fa-solid fa-check absolute bottom-4 right-4 text-xl drop-shadow" aria-hidden="true"></i>');
+            // Optional: wrap the image and title together
+            $div.append($image).append($titleOverlay).append($checked);
+
+            var $item = $('<div class="rounded w-32 h-32 cursor-pointer img-item shadow-sm hover:shadow-md hover:bg-base-200 flex justify-center items-center relative overflow-none">'
+                            +'<span class="img-loading">'
                                 +'<i class="fa-solid fa-spinner fa-pulse fa-3x fa-fw"></i>'
                             +'</span>'
                         +'</div>');
 
-            $item.prepend($image);
+            $item.prepend($div);
             content.push($item)
         }
 
@@ -167,6 +177,19 @@ export default class GalleryModal {
             _this.event.trigger('afterSave', [this]);
         });
 
+        // Bind the search field to load results dynamically
+        const debounceSearch = this.debounce(function(query: string) {
+            _this.dataManagerSearch(query);
+        }, 300); // Debounce to prevent frequent API calls
+
+
+        // Filter images on search
+        $modal.find("#search-field").on('keyup', function() {
+            const query = $(this).val(); // Get the search query
+            debounceSearch(query); // Call the filter method
+        });
+
+
         $modal.on('hidden.bs.modal', function () {
             _this.event.trigger('close')
         })
@@ -183,7 +206,8 @@ export default class GalleryModal {
             var $images_list = $modal.find('.images-list');
             var is_near_bottom = $modal_body.scrollTop() + $modal_body.height() >= $images_list.height() - 100;
 
-            if (is_near_bottom) {
+            let query = $modal.find("#search-field").val();
+            if (is_near_bottom && (!query || query === "")) {
                 _this.event.trigger('scrollBottom', [_this]);
             }
         });
@@ -208,13 +232,15 @@ export default class GalleryModal {
 
     getModalTemplate() {
 
-        var bootsrap_version = parseInt(($ as any).fn.modal.Constructor.VERSION);
-        var header_content = [
+        const bootsrap_version = parseInt(($ as any).fn.modal.Constructor.VERSION);
+        const header_content = [
             '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-            '<h4 class="modal-title">[gallery title]</h4>'
+            '<h4 class="modal-title">[gallery title]</h4>',
+            '<input type="text" id="search-field" class="form-control mt-4" placeholder="Search..." />'
+
         ];
 
-        var modal_html = ''+
+        const modal_html = ''+
             '<div class="modal summernote-gallery fade" tabindex="-1" role="dialog">'
                 + '<div class="modal-lg modal-dialog ">'
                     + '<div class="modal-content">'
@@ -278,11 +304,17 @@ export default class GalleryModal {
                         +'.img-item .fa-check{'
                             +'display : none;'
                         +'}'
-                        +'.img-item .'+ this.select_class +' + .fa-check{'
+                        +'.img-item .'+ this.select_class +'+.fa-check{'
                             +'display : block;'
+                            +'color: hsl(var(--a)/1);'
+                        +'}'
+                        +'.img-item .'+ this.select_class +'+.title-overlay {'
+                            +'background-color: hsl(var(--a)/1);'
+                            +'color: hsl(var(--ac)/1);'
                         +'}'
                         +'.'+ this.select_class +'{'
                             +'background-color: hsl(var(--a)/1);'
+                            +'border: 1px solid hsl(var(--a)/1);'
                         +'}'
                     +'</style>');
         this.$css.appendTo('body');
@@ -297,4 +329,25 @@ export default class GalleryModal {
 
         _this.event.trigger('loadFolder', [_this, folder]);
     }
+
+    dataManagerSearch(query: string) {
+        var _this = this;
+        if (query == this.latestQuery) {
+            return;
+        }
+        this.latestQuery = query;
+        this.clearContent();
+        this.showLoading();
+        _this.event.trigger('search', [_this, query]);
+    }
+
+    debounce(func: Function, wait: number) {
+        let timeout: NodeJS.Timeout;
+        return function(...args: any[]) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+
 }
